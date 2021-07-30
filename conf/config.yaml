@@ -1,0 +1,14 @@
+ctrlapp:
+  app:
+    client-application-id: ei-device
+    orgid: adv
+    server-application-id: ei-server
+    server-endpoint-id: "56781"
+  install-path: ""
+  mqtt:
+    broker: 172.21.73.22
+    clientid: "10"
+    device-name: HAH
+    passwd: DbW0lEYrUOrzic0HbUqFJg==
+    qos: 2
+    usr: admin

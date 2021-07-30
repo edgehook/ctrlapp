@@ -1,0 +1,20 @@
+eventbus:
+  mqtt:
+    port: 1884
+    qos: 2
+    session-queue-size: 100
+m2mclient:
+  client-application-id: ei-device
+  device-name: HAH
+  orgid: adv
+  server-application-id: ei-server
+  server-endpoint-id: "56781"
+transport:
+  mqtt:
+    bind: no00000
+    broker: 172.21.73.22
+    clientid: 2C:F0:5D:CA:F5:01
+    encrypt: "yes"
+    passwd: DbW0lEYrUOrzic0HbUqFJg==
+    qos: 2
+    usr: admin
