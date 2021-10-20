@@ -21,6 +21,7 @@ const (
 
 var onceM2m sync.Once
 var LWM2M_CONFIG *Lwm2mYamlConfig
+var EMPTY_SERVICES = errors.New("service is empty")
 
 type Lwm2mYamlConfig struct {
 	configYamlPath string
@@ -301,12 +302,12 @@ func (lyc *Lwm2mYamlConfig) setTransportConfig(config string) error {
 		var ipAddr = ""
 		services, ok := configJson["services"]
 		if !ok {
-			return nil
+			return EMPTY_SERVICES
 		}
 
 		mservices, isThisType := services.([]interface{})
-		if !isThisType {
-			return errors.New("No such service type")
+		if !isThisType || len(mservices) == 0 {
+			return EMPTY_SERVICES
 		}
 
 		for _, iv := range mservices {

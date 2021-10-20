@@ -29,6 +29,9 @@ func DoStartUpCore() {
 		return
 	}
 
+	//reload the isswitch flag to determine wether apphub-agent
+	// switched to apphub server when restart this ctrlapp.
+	core.isSwitched = core.conf.MqttConfig.IsSwitched
 	// connect the broker.
 	core.transport = t
 	err := core.transport.Run()
@@ -100,10 +103,31 @@ func (c *CtrAppCore) DoConfigLwm2m(req *Request) {
 	c.isNeedReport = false
 	err := config.SetTransportConfig(configString)
 	if err != nil {
-		klog.Errorf("SetTransportConfig with err %v", err)
-		c.SendResponse(req, 1, "saved config file failed", "")
-		c.isNeedReport = true
-		return
+		if err != config.EMPTY_SERVICES {
+			klog.Errorf("SetTransportConfig with err %v", err)
+			c.SendResponse(req, 1, "saved config file failed", "")
+			c.isNeedReport = true
+			return
+		} else {
+			/* switch back to IotEdge.*/
+			lwm2mConfig := &config.TransportConfig{
+				Broker:       c.conf.MqttConfig.Broker,
+				User:         c.conf.MqttConfig.User,
+				Passwd:       c.conf.MqttConfig.Passwd,
+				ClientID:     c.transport.deviceID,
+				DeviceName:   c.conf.MqttConfig.DeviceName,
+				QOS:          c.conf.MqttConfig.QOS,
+				CaFilePath:   c.conf.MqttConfig.CaFilePath,
+				CertFilePath: c.conf.MqttConfig.CertFilePath,
+				KeyFilePath:  c.conf.MqttConfig.KeyFilePath,
+				ServerEPID:   c.conf.AppConfig.ServerEPID,
+				ServerAppID:  c.conf.AppConfig.ServerAppID,
+				ClientAppID:  c.conf.AppConfig.ClientAppID,
+				OrgID:        c.conf.AppConfig.OrgID,
+			}
+
+			config.SaveTransportConfig(lwm2mConfig)
+		}
 	}
 	newConfig := config.GetTransportConfig()
 
@@ -114,8 +138,13 @@ func (c *CtrAppCore) DoConfigLwm2m(req *Request) {
 		c.StartLwm2m()
 
 		//Mark this switch flag.
-		c.isSwitched = true
-		config.SaveAControlSwitchedConfig(true)
+		if err == config.EMPTY_SERVICES {
+			c.isSwitched = false
+			config.SaveAControlSwitchedConfig(false)
+		} else {
+			c.isSwitched = true
+			config.SaveAControlSwitchedConfig(true)
+		}
 	}
 
 	c.SendResponse(req, 0, "success", "")
