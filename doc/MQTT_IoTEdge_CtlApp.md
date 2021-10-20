@@ -18,7 +18,11 @@
  		"bapi":"https://portal-apphub-manager-apphub-eks001.hz.wise-paas.com.cn/api/configmgr/blobkey",
  		"uname":"gangqiang.sun@advantech.com.cn"
  	}
-
+    #如果为switch backoff 动作，则AppHub Server端二维码的内容
+	{
+ 	}
+	推荐返回控json 串，或者至少不能包含"url" 和"services" items.
+    
 ### CtlApp Respond
 **Topic**:  device/response/${MAC}/$(parent msgID) 
 **msg**: status
